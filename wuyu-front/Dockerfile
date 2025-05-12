@@ -10,5 +10,5 @@ RUN npm run build
 FROM node:18-alpine
 RUN npm install -g serve  # 安装静态文件服务器
 COPY --from=build /app/dist /app/dist
-EXPOSE 9180
+EXPOSE 8080
 CMD ["serve", "-s", "dist", "-l", "9180"]
