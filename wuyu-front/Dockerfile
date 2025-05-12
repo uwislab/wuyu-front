@@ -6,9 +6,9 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# 运行阶段
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# 运行阶段（使用 Node.js 内置 http-server 或 serve）
+FROM node:18-alpine
+RUN npm install -g serve  # 安装静态文件服务器
+COPY --from=build /app/dist /app/dist
+EXPOSE 9180
+CMD ["serve", "-s", "dist", "-l", "9180"]
