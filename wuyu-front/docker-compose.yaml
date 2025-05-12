@@ -1,0 +1,7 @@
+version: '3'
+services:
+  frontend:
+    container_name: wuyu-front-main  # 自定义容器名
+    build: .
+    ports:
+      - "8081:80"
