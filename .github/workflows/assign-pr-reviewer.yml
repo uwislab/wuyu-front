@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, ready_for_review]
     branches: [main]  # 监听目标为主干的 PR
+permissions:
+  contents: write 
 
 jobs:
   assign-reviewer:
