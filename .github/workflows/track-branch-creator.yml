@@ -1,0 +1,27 @@
+name: Track Branch Creator
+
+on:
+  create:
+    branches: ['**']  # 监听所有分支创建事件
+
+jobs:
+  track-creator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Append branch creator to file
+        run: |
+          # 创建或更新 branches_creators.txt 文件
+          echo "$BRANCH:$CREATOR" >> branches_creators.txt
+          
+          # 提交文件变更
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add branches_creators.txt
+          git commit -m "Track creator of branch $BRANCH"
+          git push
+        env:
+          BRANCH: ${{ github.ref_name }}
+          CREATOR: ${{ github.actor }}
