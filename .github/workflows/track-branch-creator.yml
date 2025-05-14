@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main  # 明确检出main分支
 
       - name: Debug branch info
         run: |
@@ -20,19 +22,30 @@ jobs:
 
       - name: Append branch creator to file
         run: |
-          # 拉取最新代码避免冲突
-          git config --global pull.rebase true
-          git pull origin main
-
-          # 追加记录到文件
-          echo "$BRANCH:$CREATOR" >> branches_creators.txt
-
-          # 提交变更
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add branches_creators.txt
-          git commit -m "Track creator of branch $BRANCH"
-          git push
-        env:
-          BRANCH: ${{ github.ref_name }}
-          CREATOR: ${{ github.actor }}
+          # 确保文件存在
+          touch branches_creators.txt
+          
+          # 追加记录到文件 (使用绝对引用变量)
+          echo "${{ github.ref_name }}:${{ github.actor }}" >> branches_creators.txt
+          
+          # 显示文件内容用于调试
+          echo "File content:"
+          cat branches_creators.txt
+          
+          # 检查是否有变更需要提交
+          if [[ $(git status --porcelain) ]]; then
+            # 提交变更
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "actions@github.com"
+            git add branches_creators.txt
+            git commit -m "Track creator of branch ${{ github.ref_name }}"
+            
+            # 推送前再次拉取 (避免竞态条件)
+            git pull origin main --rebase
+            
+            # 推送变更
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi
+        shell: bash
