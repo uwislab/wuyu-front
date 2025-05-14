@@ -3,6 +3,9 @@ name: Track Branch Creator
 on:
   create:
     branches: ['**']  # 监听所有分支创建事件
+    #给出write权限
+permissions:
+  contents: write 
 
 jobs:
   track-creator:
